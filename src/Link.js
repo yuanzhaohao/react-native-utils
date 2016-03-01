@@ -2,9 +2,11 @@
 
 import React, {
   View,
-  StyleSheet,
   NativeModules,
-  TouchableHighlight
+  Platform,
+  TouchableHighlight,
+  TouchableNativeFeedback,
+  LinkingIOS
 } from 'react-native';
 
 import _ from 'underscore';
@@ -63,31 +65,29 @@ var Link = React.createClass({
       if (NativeModules && NativeModules.URLOpenService) {
         NativeModules.URLOpenService.open(href);
       }
+      else if (LinkingIOS && LinkingIOS.openURL) {
+        LinkingIOS.openURL(self.fixSchema(href));
+      }
     }
   },
 
   render() {
     var children = this.props.children;
+    var TouchableElement = TouchableHighlight;
+
+    if (Platform.OS === 'android') {
+     TouchableElement = TouchableNativeFeedback;
+    }
     return (
-      <TouchableHighlight
+      <TouchableElement
         {...this.props}
         onPress={this._press}
         ref={'link'}
         activeOpacity={this.props.activeOpacity}
         underlayColor={this.props.underlayColor} >
         <View>{children}</View>
-      </TouchableHighlight>
+      </TouchableElement>
     );
-  }
-});
-
-var styles = StyleSheet.create({
-  cover: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
   }
 });
 
